@@ -12,6 +12,7 @@ const STATE_ENDED = 3;   // 勝負あり
 
 let gameState = STATE_IDLE;
 let timerId = null;
+let isProcessing = false; // ダブルタップ防止フラグ
 
 // ゲーム開始処理
 function startGame() {
@@ -45,7 +46,17 @@ function triggerSignal() {
 
 // タップ処理
 function handleTap(player) {
-    if (gameState === STATE_ENDED) return;
+    // クールダウン中または既に終了している場合は無視
+    if (isProcessing || gameState === STATE_ENDED) return;
+
+    isProcessing = true; // タップ処理開始
+
+    // タップエフェクトを追加
+    const tappedArea = document.getElementById(player);
+    tappedArea.classList.add('tap-effect');
+    setTimeout(() => {
+        tappedArea.classList.remove('tap-effect');
+    }, 150);
 
     const opponent = (player === 'p1') ? 'p2' : 'p1';
 
@@ -57,6 +68,11 @@ function handleTap(player) {
         // 正常な勝利
         endGame(player, "WINNER!", opponent, "LOSE...");
     }
+
+    // 300ms後にクールダウン解除
+    setTimeout(() => {
+        isProcessing = false;
+    }, 300);
 }
 
 // 勝利判定後の処理
@@ -72,6 +88,7 @@ function endGame(winnerId, winMsg, loserId, loseMsg) {
     loserEl.className = 'player-area lose';
     loserEl.innerText = loseMsg;
 
+        isProcessing = false; // クールダウンもリセット
     // 2秒後にリトライ可能にするオーバーレイを表示
     setTimeout(() => {
         startBtn.innerText = "RETRY";

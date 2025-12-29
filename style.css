@@ -21,9 +21,20 @@ body {
     font-size: 3rem;
     font-weight: bold;
     text-transform: uppercase;
-    transition: background-color 0.1s;
+    transition: background-color 0.1s, transform 0.1s, filter 0.1s;
     cursor: pointer;
     position: relative;
+}
+
+/* タップ時のアニメーション */
+.player-area:active {
+    transform: scale(0.98);
+    filter: brightness(0.85);
+}
+
+.player-area.tap-effect {
+    transform: scale(0.95);
+    filter: brightness(0.8);
 }
 
 /* プレイヤー2（上側）：180度回転 */
