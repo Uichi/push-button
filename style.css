@@ -86,3 +86,11 @@ body {
 .go { background-color: #2ed573 !important; color: white !important; }    /* スタート（緑） */
 .win { background-color: #ffa502 !important; color: white !important; }   /* 勝利（金） */
 .lose { background-color: #57606f !important; color: #a4b0be !important; } /* 敗北（グレー） */
+
+/* 反応速度表示 */
+.reaction-time {
+    font-size: 1.5rem;
+    margin-top: 10px;
+    font-weight: normal;
+    opacity: 0.9;
+}

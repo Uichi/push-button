@@ -13,6 +13,7 @@ const STATE_ENDED = 3;   // 勝負あり
 let gameState = STATE_IDLE;
 let timerId = null;
 let isProcessing = false; // ダブルタップ防止フラグ
+let goTime = null; // GOサイン時刻を記録
 
 // ゲーム開始処理
 function startGame() {
@@ -38,6 +39,7 @@ function startGame() {
 
 // GOサイン（色が緑に変わる）
 function triggerSignal() {
+    goTime = Date.now(); // GO時刻を記録
     p1Area.className = 'player-area go';
     p2Area.className = 'player-area go';
     p1Area.innerText = "TAP!";
@@ -83,17 +85,34 @@ function endGame(winnerId, winMsg, loserId, loseMsg) {
     const loserEl = document.getElementById(loserId);
 
     winnerEl.className = 'player-area win';
-    winnerEl.innerText = winMsg;
-    
     loserEl.className = 'player-area lose';
     loserEl.innerText = loseMsg;
 
-        isProcessing = false; // クールダウンもリセット
+    // 反応速度を計算・表示
+    let reactionTime = "";
+    if (goTime !== null && gameState === STATE_ENDED) {
+        const timeDiff = Date.now() - goTime;
+        reactionTime = `${timeDiff}ms`;
+    }
+
+    // 勝者の表示：メッセージと反応速度
+    winnerEl.innerText = winMsg;
+    if (reactionTime && gameState === STATE_ENDED) {
+        // フライングでない場合（通常勝利時）のみ反応速度を表示
+        if (gameState === STATE_ENDED && goTime !== null) {
+            const timeDiff = Date.now() - goTime;
+            winnerEl.innerHTML = `${winMsg}<div class="reaction-time">${timeDiff}ms</div>`;
+        }
+    } else {
+        winnerEl.innerText = winMsg;
+    }
+
     // 2秒後にリトライ可能にするオーバーレイを表示
     setTimeout(() => {
         startBtn.innerText = "RETRY";
         overlay.style.display = 'flex';
         gameState = STATE_IDLE;
+        isProcessing = false; // クールダウンもリセット
     }, 2000);
 }
 
