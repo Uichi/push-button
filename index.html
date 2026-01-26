@@ -4,18 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Reflex Battle</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="src/home/style.css">
+    <link rel="stylesheet" href="src/games/reflex/style.css">
+    <link rel="stylesheet" href="src/games/compare/style.css">
+    <script defer src="src/games/reflex/index.js"></script>
+    <script defer src="src/games/compare/index.js"></script>
+    <script defer src="src/launcher.js"></script>
 </head>
 <body>
-
-    <div id="p2" class="player-area">Player 2</div>
-    <div id="p1" class="player-area">Player 1</div>
-
-    <div id="overlay">
-        <h1 class="title">REFLEX BATTLE</h1>
-        <button id="start-btn">START</button>
-    </div>
-
+    <div id="home-root"></div>
+    <div id="game-root"></div>
 </body>
 </html>
