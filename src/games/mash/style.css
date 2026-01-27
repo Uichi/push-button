@@ -1,0 +1,191 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.mash {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: 'Arial', sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    background: #111827;
+    color: #e5e7eb;
+}
+
+.mash-timer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 5rem;
+    font-weight: 900;
+    color: #fca5a5;
+    z-index: 5;
+    text-shadow: 0 0 20px rgba(252, 165, 165, 0.5);
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.mash-player {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 20px;
+    transition: background-color 0.3s;
+}
+
+#mash-p2 {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.mash-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+#mash-p1 .mash-info {
+    margin-top: 10px;
+    margin-bottom: 0;
+    order: 3; /* 下部に配置 */
+}
+
+.mash-label {
+    font-size: 1rem;
+    opacity: 0.6;
+}
+
+.mash-count {
+    font-size: 3rem;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+/* バー */
+.mash-bar-container {
+    width: 80%;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+.mash-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ef4444, #f87171);
+    transition: width 0.1s;
+}
+
+/* ボタン */
+.mash-btn {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    font-size: 1.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(220, 38, 38, 0.5);
+    transition: transform 0.05s, filter 0.05s;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mash-btn:active, .mash-btn.mash-active {
+    transform: scale(0.92);
+    filter: brightness(1.2);
+}
+
+.mash-btn:disabled {
+    filter: grayscale(0.8);
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* P2特有スタイル */
+#mash-p2 .mash-info,
+#mash-p2 .mash-btn {
+    /* P2要素はすべて逆さ */
+    /* コンテナ全体は回さないが、個々の要素を見やすくする */
+}
+#mash-p2 .mash-label,
+#mash-p2 .mash-count {
+    transform: rotate(180deg);
+}
+#mash-p2 .mash-btn {
+    transform: rotate(180deg);
+}
+#mash-p2 .mash-btn:active,
+#mash-p2 .mash-btn.mash-active {
+    transform: rotate(180deg) scale(0.92);
+}
+
+/* 勝敗 */
+.mash-win {
+    background-color: rgba(239, 68, 68, 0.2);
+}
+.mash-lose {
+    background-color: rgba(31, 41, 55, 0.8);
+    opacity: 0.6;
+}
+.mash-draw {
+    background-color: rgba(107, 114, 128, 0.2);
+}
+
+/* オーバーレイ */
+.mash-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.mash-title {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #f87171;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.mash-start-btn {
+    font-size: 2rem;
+    padding: 15px 50px;
+    background: linear-gradient(90deg, #ef4444, #b91c1c);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+    transition: transform 0.1s;
+}
+
+.mash-start-btn:active {
+    transform: scale(0.95);
+}

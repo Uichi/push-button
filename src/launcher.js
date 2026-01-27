@@ -14,32 +14,58 @@ function renderHome(homeEl, gameEl) {
 
     const title = document.createElement('h1');
     title.className = 'hub-title';
-    title.innerText = 'Mini Games';
+    title.innerText = 'TAP Games';
 
     const cards = [
         {
             name: 'Reflex Battle',
             desc: '1台で対戦する早押しリフレックス',
+            icon: '⚡',
+            color: '#f59e0b',
             action: () => startReflex(gameEl, homeEl),
         },
         {
             name: 'Number Duel',
             desc: '数字の大小を即判定して早押し',
+            icon: '🔢',
+            color: '#3b82f6',
             action: () => startCompare(gameEl, homeEl),
         },
         {
             name: 'Pattern Memory',
             desc: '光った順番を記憶してタップ勝負',
+            icon: '🧠',
+            color: '#8b5cf6',
             action: () => startMemory(gameEl, homeEl),
+        },
+        {
+            name: 'Tap Rush',
+            desc: '5秒間の連打バトル！',
+            icon: '🔥',
+            color: '#ef4444',
+            action: () => startMash(gameEl, homeEl),
+        },
+        {
+            name: 'Just Fit',
+            desc: 'タイミングよく止める！',
+            icon: '🎯',
+            color: '#10b981',
+            action: () => startJustFit(gameEl, homeEl),
         },
     ];
 
     const cardsWrap = document.createElement('div');
     cardsWrap.className = 'hub-cards';
 
-    cards.forEach(({ name, desc, action }) => {
+    cards.forEach(({ name, desc, icon, color, action }) => {
         const card = document.createElement('div');
         card.className = 'hub-card';
+        // Set accent color for hover/border effects
+        card.style.setProperty('--card-accent', color);
+
+        const iconEl = document.createElement('div');
+        iconEl.className = 'hub-icon';
+        iconEl.innerText = icon;
 
         const n = document.createElement('div');
         n.className = 'hub-name';
@@ -54,6 +80,7 @@ function renderHome(homeEl, gameEl) {
         playBtn.innerText = 'PLAY';
         playBtn.addEventListener('click', action);
 
+        card.appendChild(iconEl);
         card.appendChild(n);
         card.appendChild(d);
         card.appendChild(playBtn);
@@ -150,6 +177,69 @@ function startMemory(gameEl, homeEl) {
     gameEl.appendChild(mount);
 
     const game = window.createMemoryGame(mount);
+    currentGame = game;
+    game.start();
+
+    back.addEventListener('click', () => {
+        game.dispose();
+        currentGame = null;
+        renderHome(homeEl, gameEl);
+    });
+}
+
+function startMash(gameEl, homeEl) {
+    if (currentGame) {
+        currentGame.dispose();
+        currentGame = null;
+    }
+
+    homeEl.style.display = 'none';
+    gameEl.style.display = 'block';
+    gameEl.innerHTML = '';
+
+    const back = document.createElement('button');
+    back.className = 'hub-back-btn';
+    back.innerText = 'HOME';
+
+    const mount = document.createElement('div');
+    mount.id = 'mash-root';
+
+    gameEl.appendChild(back);
+    gameEl.appendChild(mount);
+
+    const game = window.createMashGame(mount);
+    currentGame = game;
+    game.start();
+
+    back.addEventListener('click', () => {
+        game.dispose();
+        currentGame = null;
+        renderHome(homeEl, gameEl);
+    });
+}
+
+function startJustFit(gameEl, homeEl) {
+    if (currentGame) {
+        currentGame.dispose();
+        currentGame = null;
+    }
+
+    homeEl.style.display = 'none';
+    gameEl.style.display = 'block';
+    gameEl.innerHTML = '';
+
+    const back = document.createElement('button');
+    back.className = 'hub-back-btn';
+    back.innerText = 'HOME';
+
+    const mount = document.createElement('div');
+    mount.id = 'justfit-root';
+
+    gameEl.appendChild(back);
+    gameEl.appendChild(mount);
+
+    // Assuming window.createJustFitGame is available
+    const game = window.createJustFitGame(mount);
     currentGame = game;
     game.start();
 

@@ -57,33 +57,38 @@ html, body {
 .compare-score-board {
     position: absolute;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    left: 10px; /* 左端に寄せる */
+    transform: translateY(-50%);
     display: flex;
-    gap: 40px;
+    flex-direction: column; /* 縦に並べて横向きの数字として見せる */
+    gap: 120px; /* P1とP2の間隔 */
     z-index: 4;
     pointer-events: none;
 }
 
 .compare-score {
-    font-size: 4rem;
+    font-size: 3rem;
     font-weight: 900;
-    color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.15); /* 少し濃くした */
     transition: color 0.2s, transform 0.2s;
+    /* 数字自体を横倒しにする（画面左側にある場合、右90度が自然） */
+    transform: rotate(90deg);
 }
 
 .compare-score.active {
     color: rgba(255, 255, 255, 0.9);
-    transform: scale(1.2);
+    transform: rotate(90deg) scale(1.4);
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
 }
 
 #compare-score-p2 {
-    transform: rotate(180deg);
+    /* P2スコアはP2側に向けて配置したい場合も、横向きなら同じ90度で統一するのが見やすい */
+    /* あるいは逆側の-90度にするなど */
+    transform: rotate(90deg);
 }
 
 #compare-score-p2.active {
-    transform: rotate(180deg) scale(1.2);
+    transform: rotate(90deg) scale(1.4);
 }
 
 .compare-goal-bottom {
@@ -94,6 +99,28 @@ html, body {
 
 .compare-goal-bottom.visible {
     transform: translateX(-50%) rotate(180deg) scale(1);
+}
+
+.compare-rule-announce {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    font-size: 3rem;
+    font-weight: 900;
+    color: #fbbf24;
+    text-shadow: 0 0 30px rgba(0,0,0,0.8);
+    opacity: 0;
+    z-index: 20;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.compare-rule-announce.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    letter-spacing: 4px;
 }
 
 .compare-player {

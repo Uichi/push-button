@@ -31,6 +31,7 @@ function createCompareGame(root, options = {}) {
         overlay,
         startBtn,
         titleEl,
+        ruleAnnounce,
         goalEl,
         goalElBottom,
         p1Btns,
@@ -118,6 +119,10 @@ function createCompareGame(root, options = {}) {
         title.className = 'compare-title';
         title.innerText = 'NUMBER DUEL';
 
+        const ruleAnnounce = document.createElement('div');
+        ruleAnnounce.className = 'compare-rule-announce';
+        ruleAnnounce.innerText = 'FIRST TO 3 WINS!';
+
         const btn = document.createElement('button');
         btn.id = 'compare-start-btn';
         btn.className = 'compare-start-btn';
@@ -129,6 +134,7 @@ function createCompareGame(root, options = {}) {
         containerEl.appendChild(goalEl);
         containerEl.appendChild(goalElBottom);
         containerEl.appendChild(scoreBoard);
+        containerEl.appendChild(ruleAnnounce);
         containerEl.appendChild(p2El);
         containerEl.appendChild(p2Btns);
         containerEl.appendChild(p1Btns);
@@ -145,6 +151,7 @@ function createCompareGame(root, options = {}) {
             overlay: overlayEl,
             startBtn: btn,
             titleEl: title,
+            ruleAnnounce,
             goalEl,
             goalElBottom,
             p1Btns: { a: p1A, b: p1B },
@@ -220,8 +227,17 @@ function createCompareGame(root, options = {}) {
         p1Score = 0;
         p2Score = 0;
         updateScoreBoard();
+
+        // Show Rule Announce
+        ruleAnnounce.classList.add('visible');
         
-        rollNumbers();
+        // Hide rule and start game after delay
+        setTimeout(() => {
+            ruleAnnounce.classList.remove('visible');
+            setTimeout(() => {
+                rollNumbers();
+            }, 300);
+        }, 1500);
     }
 
     function updateScoreBoard(highlight) {
