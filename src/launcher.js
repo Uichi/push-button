@@ -27,6 +27,11 @@ function renderHome(homeEl, gameEl) {
             desc: '数字の大小を即判定して早押し',
             action: () => startCompare(gameEl, homeEl),
         },
+        {
+            name: 'Pattern Memory',
+            desc: '光った順番を記憶してタップ勝負',
+            action: () => startMemory(gameEl, homeEl),
+        },
     ];
 
     const cardsWrap = document.createElement('div');
@@ -114,6 +119,37 @@ function startCompare(gameEl, homeEl) {
     gameEl.appendChild(mount);
 
     const game = window.createCompareGame(mount);
+    currentGame = game;
+    game.start();
+
+    back.addEventListener('click', () => {
+        game.dispose();
+        currentGame = null;
+        renderHome(homeEl, gameEl);
+    });
+}
+
+function startMemory(gameEl, homeEl) {
+    if (currentGame) {
+        currentGame.dispose();
+        currentGame = null;
+    }
+
+    homeEl.style.display = 'none';
+    gameEl.style.display = 'block';
+    gameEl.innerHTML = '';
+
+    const back = document.createElement('button');
+    back.className = 'hub-back-btn';
+    back.innerText = 'HOME';
+
+    const mount = document.createElement('div');
+    mount.id = 'memory-root';
+
+    gameEl.appendChild(back);
+    gameEl.appendChild(mount);
+
+    const game = window.createMemoryGame(mount);
     currentGame = game;
     game.start();
 
