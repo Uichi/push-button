@@ -10,6 +10,8 @@ function createCompareGame(root, options = {}) {
         max: 99,
         cooldownMs: 300,
         tapEffectMs: 120,
+        goalDelayMs: 600,
+        maxScore: 3, // 3本先取（5本勝負）
         onResult: null,
         ...options,
     };
@@ -19,6 +21,8 @@ function createCompareGame(root, options = {}) {
     let numA = null;
     let numB = null;
     let goalIsBig = true;
+    let p1Score = 0;
+    let p2Score = 0;
 
     const {
         container,
@@ -31,6 +35,8 @@ function createCompareGame(root, options = {}) {
         goalElBottom,
         p1Btns,
         p2Btns,
+        p1ScoreEl,
+        p2ScoreEl,
     } = buildDom(root);
 
     const onStart = () => startGame();
@@ -57,13 +63,26 @@ function createCompareGame(root, options = {}) {
         goalElBottom.className = 'compare-goal compare-goal-bottom';
         goalElBottom.innerText = 'BIGGER WINS';
 
+        const scoreBoard = document.createElement('div');
+        scoreBoard.className = 'compare-score-board';
+        const p2ScoreEl = document.createElement('div');
+        p2ScoreEl.id = 'compare-score-p2';
+        p2ScoreEl.className = 'compare-score';
+        p2ScoreEl.innerText = '0';
+        const p1ScoreEl = document.createElement('div');
+        p1ScoreEl.id = 'compare-score-p1';
+        p1ScoreEl.className = 'compare-score';
+        p1ScoreEl.innerText = '0';
+        scoreBoard.appendChild(p2ScoreEl);
+        scoreBoard.appendChild(p1ScoreEl);
+
         const p2El = document.createElement('div');
         p2El.id = 'compare-p2';
         p2El.className = 'compare-player';
         p2El.innerText = 'READY';
 
         const p2Btns = document.createElement('div');
-        p2Btns.className = 'compare-choices';
+        p2Btns.className = 'compare-choices compare-choices-p2';
         const p2A = document.createElement('button');
         p2A.className = 'compare-btn';
         p2A.classList.add('compare-btn-p2');
@@ -109,6 +128,7 @@ function createCompareGame(root, options = {}) {
 
         containerEl.appendChild(goalEl);
         containerEl.appendChild(goalElBottom);
+        containerEl.appendChild(scoreBoard);
         containerEl.appendChild(p2El);
         containerEl.appendChild(p2Btns);
         containerEl.appendChild(p1Btns);
@@ -129,6 +149,8 @@ function createCompareGame(root, options = {}) {
             goalElBottom,
             p1Btns: { a: p1A, b: p1B },
             p2Btns: { a: p2A, b: p2B },
+            p1ScoreEl,
+            p2ScoreEl,
         };
     }
 
@@ -141,10 +163,17 @@ function createCompareGame(root, options = {}) {
             numA = randInt(settings.min, settings.max);
             numB = randInt(settings.min, settings.max);
         } while (numA === numB);
-        goalIsBig = Math.random() < 0.5;
-        const goalText = goalIsBig ? 'BIGGER WINS' : 'SMALLER WINS';
-        goalEl.innerText = goalText;
-        goalElBottom.innerText = goalText;
+        
+        // Hide goal initially
+        goalEl.classList.remove('visible');
+        goalElBottom.classList.remove('visible');
+        goalEl.innerText = '';
+        goalElBottom.innerText = '';
+        
+        gameState = STATE_IDLE; // Wait for goal
+        isProcessing = false; // Reset processing flag for new round
+        disableButtons();
+
         p1Area.className = 'compare-player compare-active';
         p2Area.className = 'compare-player compare-active';
         p1Area.innerHTML = `<div class="compare-label">P1</div>`;
@@ -154,6 +183,20 @@ function createCompareGame(root, options = {}) {
         p1Btns.b.innerText = numB;
         p2Btns.a.innerText = numA;
         p2Btns.b.innerText = numB;
+
+        // Show goal after delay
+        setTimeout(() => {
+            goalIsBig = Math.random() < 0.5;
+            const goalText = goalIsBig ? 'BIGGER WINS' : 'SMALLER WINS';
+            goalEl.innerText = goalText;
+            goalElBottom.innerText = goalText;
+            
+            goalEl.classList.add('visible');
+            goalElBottom.classList.add('visible');
+            
+            gameState = STATE_ACTIVE;
+            enableButtons();
+        }, settings.goalDelayMs);
     }
 
     function enableButtons() {
@@ -169,54 +212,96 @@ function createCompareGame(root, options = {}) {
     }
 
     function startGame() {
-        gameState = STATE_ACTIVE;
+        gameState = STATE_IDLE;
         isProcessing = false;
         overlay.style.display = 'none';
+        
+        // Reset scores
+        p1Score = 0;
+        p2Score = 0;
+        updateScoreBoard();
+        
         rollNumbers();
-        enableButtons();
+    }
+
+    function updateScoreBoard(highlight) {
+        p1ScoreEl.innerText = p1Score;
+        p2ScoreEl.innerText = p2Score;
+        p1ScoreEl.className = 'compare-score';
+        p2ScoreEl.className = 'compare-score';
+        if (highlight === 'p1') p1ScoreEl.classList.add('active');
+        if (highlight === 'p2') p2ScoreEl.classList.add('active');
     }
 
     function handleChoice(player, choice) {
         if (isProcessing || gameState !== STATE_ACTIVE) return;
         isProcessing = true;
+        gameState = STATE_IDLE; // Prevent multiple clicks
 
         const btns = player === 'p1' ? p1Btns : p2Btns;
         const tapped = choice === 'a' ? btns.a : btns.b;
         tapped.classList.add('compare-tap');
         setTimeout(() => tapped.classList.remove('compare-tap'), settings.tapEffectMs);
 
-        const opponent = player === 'p1' ? 'p2' : 'p1';
         const chosenVal = choice === 'a' ? numA : numB;
         const correctVal = goalIsBig ? Math.max(numA, numB) : Math.min(numA, numB);
 
         const isCorrect = chosenVal === correctVal;
-        const winnerId = isCorrect ? player : opponent;
-        const loserId = winnerId === 'p1' ? 'p2' : 'p1';
+        
+        // Determine round winner
+        let roundWinner = null;
+        if (isCorrect) {
+            roundWinner = player;
+        } else {
+            roundWinner = player === 'p1' ? 'p2' : 'p1';
+        }
 
-        endGame(winnerId, loserId, !isCorrect);
+        if (roundWinner === 'p1') p1Score++;
+        else p2Score++;
+
+        updateScoreBoard(roundWinner);
+        
+        // Highlight round winner visually
+        const p1Class = roundWinner === 'p1' ? 'compare-win' : 'compare-lose';
+        const p2Class = roundWinner === 'p2' ? 'compare-win' : 'compare-lose';
+        p1Area.className = `compare-player ${p1Class}`;
+        p2Area.className = `compare-player ${p2Class}`;
+        p1Area.innerHTML = `<div class="compare-result">${roundWinner==='p1'?'WIN':'LOSE'}</div>`;
+        p2Area.innerHTML = `<div class="compare-result">${roundWinner==='p2'?'WIN':'LOSE'}</div>`;
+        
+        disableButtons();
+
+        // Check Match Winner
+        if (p1Score >= settings.maxScore || p2Score >= settings.maxScore) {
+            const matchWinner = p1Score > p2Score ? 'p1' : 'p2';
+            const matchLoser = matchWinner === 'p1' ? 'p2' : 'p1';
+            endMatch(matchWinner, matchLoser);
+        } else {
+            // Next round
+            setTimeout(() => {
+                rollNumbers();
+            }, 1500);
+        }
     }
 
-    function endGame(winnerId, loserId, foul) {
+    function endMatch(winnerId, loserId) {
         gameState = STATE_ENDED;
-        disableButtons();
+        
+        // Final display upgrade
         const winnerEl = winnerId === 'p1' ? p1Area : p2Area;
         const loserEl = loserId === 'p1' ? p1Area : p2Area;
-
-        winnerEl.className = 'compare-player compare-win';
-        loserEl.className = 'compare-player compare-lose';
-        winnerEl.innerHTML = `${winnerId.toUpperCase()}<div class="compare-result">WIN</div>`;
-        loserEl.innerHTML = `${loserId.toUpperCase()}<div class="compare-result">LOSE</div>`;
-
+        winnerEl.innerHTML = `${winnerId.toUpperCase()}<div class="compare-result">CHAMPION</div>`;
+        
         if (typeof settings.onResult === 'function') {
-            settings.onResult({ winner: winnerId, loser: loserId, foul });
+            settings.onResult({ winner: winnerId, loser: loserId });
         }
 
         setTimeout(() => {
-            startBtn.innerText = 'RETRY';
+            titleEl.innerText = `${winnerId.toUpperCase()} WINS!`;
+            startBtn.innerText = 'REPLAY MATCH';
             overlay.style.display = 'flex';
             gameState = STATE_IDLE;
-            isProcessing = false;
-        }, 1500);
+        }, 2000);
     }
 
     function dispose() {

@@ -65,7 +65,7 @@ html, body {
 }
 
 #memory-p2 {
-    border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+    /* border-bottom: 3px solid rgba(255, 255, 255, 0.3); 中央線を削除 */
 }
 
 .memory-ready {
@@ -112,8 +112,13 @@ html, body {
 }
 
 .memory-btn:active {
-    transform: scale(0.92);
+    /* 一般押下時は明るさのみ変更 */
     filter: brightness(0.85);
+}
+
+/* P1側のボタンのみ押下時にスケール（P2には適用しない） */
+#memory-p1 .memory-btn:active {
+    transform: scale(0.92);
 }
 
 .memory-btn:disabled {
@@ -121,9 +126,16 @@ html, body {
     cursor: not-allowed;
 }
 
-.memory-btn-pressed {
+/* P1側のプレスエフェクト: スケールのみ */
+#memory-p1 .memory-btn.memory-btn-pressed {
     background: #fbbf24 !important;
-    transform: scale(0.88) !important;
+    transform: scale(0.88);
+}
+
+/* P2側のプレスエフェクト: 回転した状態でスケール */
+#memory-p2 .memory-btn.memory-btn-pressed {
+    background: #fbbf24 !important;
+    transform: rotate(180deg) scale(0.88);
 }
 
 /* P2ボタンは常時逆さ表示 */
