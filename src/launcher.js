@@ -20,35 +20,30 @@ function renderHome(homeEl, gameEl) {
         {
             name: 'Reflex Battle',
             desc: '1台で対戦する早押しリフレックス',
-            icon: '⚡',
             color: '#f59e0b',
             action: () => startReflex(gameEl, homeEl),
         },
         {
             name: 'Number Duel',
             desc: '数字の大小を即判定して早押し',
-            icon: '🔢',
             color: '#3b82f6',
             action: () => startCompare(gameEl, homeEl),
         },
         {
             name: 'Pattern Memory',
             desc: '光った順番を記憶してタップ勝負',
-            icon: '🧠',
             color: '#8b5cf6',
             action: () => startMemory(gameEl, homeEl),
         },
         {
             name: 'Tap Rush',
             desc: '5秒間の連打バトル！',
-            icon: '🔥',
             color: '#ef4444',
             action: () => startMash(gameEl, homeEl),
         },
         {
             name: 'Just Fit',
             desc: 'タイミングよく止める！',
-            icon: '🎯',
             color: '#10b981',
             action: () => startJustFit(gameEl, homeEl),
         },
@@ -57,15 +52,11 @@ function renderHome(homeEl, gameEl) {
     const cardsWrap = document.createElement('div');
     cardsWrap.className = 'hub-cards';
 
-    cards.forEach(({ name, desc, icon, color, action }) => {
+    cards.forEach(({ name, desc, color, action }) => {
         const card = document.createElement('div');
         card.className = 'hub-card';
         // Set accent color for hover/border effects
         card.style.setProperty('--card-accent', color);
-
-        const iconEl = document.createElement('div');
-        iconEl.className = 'hub-icon';
-        iconEl.innerText = icon;
 
         const n = document.createElement('div');
         n.className = 'hub-name';
@@ -80,7 +71,6 @@ function renderHome(homeEl, gameEl) {
         playBtn.innerText = 'PLAY';
         playBtn.addEventListener('click', action);
 
-        card.appendChild(iconEl);
         card.appendChild(n);
         card.appendChild(d);
         card.appendChild(playBtn);
